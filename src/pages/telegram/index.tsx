@@ -51,16 +51,22 @@ export default function VNVNCScanner() {
     try {
       // Extract code from URL or use raw data
       let extractedCode = rawData;
-      if (rawData.includes('/v/')) {
-        const match = rawData.match(/\/v\/([A-Z0-9-]+)/);
+      console.log('🔥🔥🔥 VNVNC SCANNER V4.0 ACTIVE 🔥🔥🔥');
+      console.log('Raw scanned data:', rawData);
+      
+      if (rawData.includes('/invite/')) {
+        const match = rawData.match(/\/invite\/([A-Z0-9-]+)/);
         extractedCode = match ? match[1] : rawData;
+        console.log('Extracted code from URL:', extractedCode);
       }
 
       // Validate format - VNVNC format
-      // Format: VNVNC-2025-XXXXXX
-      const vnvncFormatRegex = /^VNVNC-\d{4}-[A-Z0-9]+$/;
+      // Format: VNVNC-2025-XXXXXX (6 alphanumeric characters)
+      const vnvncFormatRegex = /^VNVNC-2025-[A-Z0-9]{6}$/;
+      console.log('Testing code:', extractedCode, 'against regex:', vnvncFormatRegex.toString());
       
       if (!extractedCode.match(vnvncFormatRegex)) {
+        console.error('Format validation failed for code:', extractedCode);
         throw new Error('INVALID_FORMAT');
       }
 

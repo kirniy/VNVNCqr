@@ -52,10 +52,13 @@ export default function QRScanner() {
   const processCode = async (scannedData: string) => {
     setMode('result');
     
+    console.log('🔥🔥🔥 VNVNC SCANNER VERSION 3.0 ACTIVE 🔥🔥🔥');
+    console.log('Deployment timestamp:', new Date().toISOString());
+    
     try {
       // Extract code from URL or use raw code
       let code = scannedData;
-      console.log('Scanner v2 - Raw scanned data:', scannedData);
+      console.log('Scanner v3 - Raw scanned data:', scannedData);
       
       if (scannedData.includes('/invite/')) {
         const match = scannedData.match(/\/invite\/([A-Z0-9-]+)/);
