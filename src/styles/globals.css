@@ -153,4 +153,55 @@
       opacity: 1;
     }
   }
+
+  /* Admin Panel Input Styles */
+  .cyber-input {
+    @apply w-full px-4 py-2 rounded;
+    background-color: #1a1a1a;
+    border: 1px solid #333;
+    color: #ffffff;
+    transition: all 0.3s ease;
+  }
+
+  .cyber-input:focus {
+    outline: none;
+    border-color: var(--vnvnc-red);
+    box-shadow: 0 0 0 2px rgba(220, 38, 38, 0.2);
+  }
+
+  .cyber-input::placeholder {
+    color: #666;
+  }
+
+  /* Admin Panel Button */
+  .cyber-button {
+    @apply px-6 py-3 rounded font-semibold transition-all;
+    background-color: var(--vnvnc-red);
+    color: white;
+    border: 2px solid var(--vnvnc-red);
+  }
+
+  .cyber-button:hover:not(:disabled) {
+    background-color: var(--vnvnc-darkred);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(220, 38, 38, 0.4);
+  }
+
+  .cyber-button:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
+
+  /* Admin Panel Background */
+  .cyber-border {
+    border: 2px solid var(--vnvnc-red);
+    border-radius: 8px;
+  }
+
+  .cyber-grid-bg {
+    background-image: 
+      linear-gradient(rgba(220, 38, 38, 0.1) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(220, 38, 38, 0.1) 1px, transparent 1px);
+    background-size: 50px 50px;
+  }
 }

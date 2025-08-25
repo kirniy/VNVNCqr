@@ -53,20 +53,23 @@ export default function QRScanner() {
     setMode('result');
     
     try {
-      // Extract code
+      // Extract code from URL or use raw code
       let code = scannedData;
-      if (scannedData.includes('/v/')) {
-        const match = scannedData.match(/\/v\/([A-Z0-9-]+)/);
+      console.log('Scanner v2 - Raw scanned data:', scannedData);
+      
+      if (scannedData.includes('/invite/')) {
+        const match = scannedData.match(/\/invite\/([A-Z0-9-]+)/);
         code = match ? match[1] : scannedData;
+        console.log('Extracted code from URL:', code);
       }
 
-      // Validate format - accept both old and new formats
-      // Old format: ANGAR-2025-0001
-      // New format: ANGAR-BNFBP5-3UK5KR69KG54TNY
-      const oldFormatRegex = /^ANGAR-\d{4}-\d{4}$/;
-      const newFormatRegex = /^ANGAR-B[A-Z0-9]{5}-[A-Z0-9]+$/;
+      // Validate format - VNVNC format only
+      // Format: VNVNC-2025-XXXXXX
+      const vnvncFormatRegex = /^VNVNC-2025-[A-Z0-9]{6}$/;
+      console.log('Testing code format:', code, 'against regex:', vnvncFormatRegex.toString());
       
-      if (!code.match(oldFormatRegex) && !code.match(newFormatRegex)) {
+      if (!code.match(vnvncFormatRegex)) {
+        console.error('Format validation failed for code:', code);
         setIsSuccess(false);
         setMessage('НЕВЕРНЫЙ ФОРМАТ');
         await logScan(code, false, 'Invalid format');

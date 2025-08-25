@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>QR Code Decoder</title>
+    <script src="https://cdn.jsdelivr.net/npm/qr-scanner@1.4.2/qr-scanner.umd.min.js"></script>
+</head>
+<body>
+    <h1>QR Code Decoder</h1>
+    <p>Open this file in a browser and upload the QR code image to decode it</p>
+    <input type="file" id="fileInput" accept="image/*">
+    <div id="result"></div>
+    
+    <script>
+        document.getElementById('fileInput').addEventListener('change', async (e) => {
+            const file = e.target.files[0];
+            if (file) {
+                try {
+                    const result = await QrScanner.scanImage(file);
+                    document.getElementById('result').innerHTML = `
+                        <h2>Decoded QR Code:</h2>
+                        <p><strong>Raw Data:</strong> ${result}</p>
+                        <p><strong>Length:</strong> ${result.length} characters</p>
+                        <p><strong>Starts with:</strong> ${result.substring(0, 50)}...</p>
+                        <h3>Analysis:</h3>
+                        <p>Contains '/invite/': ${result.includes('/invite/')}</p>
+                        <p>Contains 'VNVNC-2025-': ${result.includes('VNVNC-2025-')}</p>
+                        <p>Full URL check: ${result.startsWith('https://vnvnc-invites.vercel.app/invite/')}</p>
+                    `;
+                    console.log('Decoded:', result);
+                } catch (error) {
+                    document.getElementById('result').innerHTML = `<p style="color: red;">Error: ${error}</p>`;
+                }
+            }
+        });
+    </script>
+</body>
+</html>

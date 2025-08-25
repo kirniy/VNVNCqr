@@ -10,6 +10,7 @@ export default function InvitationPage() {
   const [invitation, setInvitation] = useState<VNVNCInvitation | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [qrCodeUrl, setQrCodeUrl] = useState<string | null>(null);
 
   useEffect(() => {
     if (code && typeof code === 'string') {
@@ -29,6 +30,10 @@ export default function InvitationPage() {
       }
 
       setInvitation(invite);
+      
+      // Generate QR code on the client side
+      const qrCode = await InvitationManager.generateQRCode(invite.inviteUrl);
+      setQrCodeUrl(qrCode);
       
       // Track view
       await manager.trackView(inviteCode);
@@ -129,11 +134,11 @@ export default function InvitationPage() {
             </div>
 
             {/* QR Code */}
-            {invitation.qrCodeUrl && (
+            {qrCodeUrl && (
               <div className="mb-8">
                 <div className="qr-vnvnc-frame inline-block p-4 bg-white rounded-lg">
                   <img 
-                    src={invitation.qrCodeUrl} 
+                    src={qrCodeUrl} 
                     alt="QR Code" 
                     className="w-48 h-48"
                   />
