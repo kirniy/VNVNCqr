@@ -123,6 +123,16 @@ ${inviteUrl}
     return badges[status as keyof typeof badges] || 'bg-gray-600';
   };
 
+  const getStatusText = (status: string) => {
+    const statusTexts = {
+      created: 'Создано',
+      sent: 'Отправлено',
+      viewed: 'Просмотрено',
+      redeemed: 'Использовано',
+    };
+    return statusTexts[status as keyof typeof statusTexts] || status;
+  };
+
   if (loading) {
     return (
       <div className="min-h-screen bg-black flex items-center justify-center">
@@ -158,7 +168,7 @@ ${inviteUrl}
                   type="text"
                   value={batchName}
                   onChange={(e) => setBatchName(e.target.value)}
-                  placeholder="Например: Instagram Bloggers Aug 2025"
+                  placeholder="Например: Блогеры Instagram Август 2025"
                   className="vnvnc-input w-full"
                 />
               </div>
@@ -233,7 +243,7 @@ ${inviteUrl}
                       </td>
                       <td className="p-2">
                         <span className={`px-2 py-1 rounded text-xs text-white ${getStatusBadge(inv.status)}`}>
-                          {inv.status}
+                          {getStatusText(inv.status)}
                         </span>
                       </td>
                       <td className="p-2 text-gray-300 text-xs">
