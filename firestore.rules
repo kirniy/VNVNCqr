@@ -1,14 +1,14 @@
 rules_version = '2';
 service cloud.firestore {
   match /databases/{database}/documents {
-    // Allow all operations for authenticated users (simplified for VNVNC)
+    // Allow all operations for invitations (public read, write for scanner)
     match /invitations/{document} {
       allow read: if true;
-      allow write: if request.auth != null;
+      allow write: if true;  // Allow scanner to update status
     }
     
     // Allow all operations for scan logs
-    match /scan-logs/{document} {
+    match /scanLogs/{document} {
       allow read, write: if true;
     }
     
