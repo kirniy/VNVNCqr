@@ -1,13 +1,1 @@
-{
-  "framework": "nextjs",
-  "buildCommand": "npm run build",
-  "outputDirectory": ".next",
-  "devCommand": "npm run dev",
-  "installCommand": "npm install",
-  "regions": ["fra1"],
-  "functions": {
-    "src/pages/api/invitations/redeem.ts": {
-      "maxDuration": 10
-    }
-  }
-}
+{}

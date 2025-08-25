@@ -1,9 +1,10 @@
-import { db, storage } from './firebase';
+import { db } from './firebase';
 import { 
   collection, 
   addDoc, 
   doc, 
-  updateDoc, 
+  updateDoc,
+  deleteDoc, 
   getDocs, 
   query, 
   where, 
@@ -11,7 +12,6 @@ import {
   serverTimestamp,
   Timestamp
 } from 'firebase/firestore';
-import { ref, uploadString, getDownloadURL } from 'firebase/storage';
 import QRCode from 'qrcode';
 
 export interface VNVNCInvitation {
@@ -19,13 +19,15 @@ export interface VNVNCInvitation {
   code: string;
   instagramHandle: string;
   bloggerName?: string;
-  status: 'created' | 'sent' | 'viewed' | 'redeemed';
+  status: 'created' | 'sent' | 'viewed' | 'redeemed' | 'expired';
   inviteUrl: string;
   qrCodeUrl?: string;
+  invitationType: 'link' | 'qr'; // New field for invitation type
   createdAt?: Timestamp;
   sentAt?: Timestamp;
   viewedAt?: Timestamp;
   redeemedAt?: Timestamp;
+  expiresAt?: Timestamp; // Expiration date
   metadata: {
     eventDate: '2025-08-29' | '2025-08-30' | 'both';
     validForBothDays: boolean;
@@ -49,8 +51,8 @@ export class InvitationManager {
     return `${prefix}-${year}-${random}`;
   }
 
-  // Generate QR code for an invitation
-  private async generateQRCode(inviteUrl: string, code: string): Promise<string> {
+  // Generate QR code for an invitation (returns data URL)
+  static async generateQRCode(inviteUrl: string): Promise<string> {
     try {
       // Generate QR code with VNVNC branding colors
       const qrCodeDataUrl = await QRCode.toDataURL(inviteUrl, {
@@ -63,17 +65,77 @@ export class InvitationManager {
           light: '#FFFFFF', // White background
         },
       });
-
-      // Upload to Firebase Storage
-      const storageRef = ref(storage, `qr-codes/invitations/${code}.png`);
-      await uploadString(storageRef, qrCodeDataUrl, 'data_url');
-      const downloadUrl = await getDownloadURL(storageRef);
       
-      return downloadUrl;
+      return qrCodeDataUrl;
     } catch (error) {
       console.error('Error generating QR code:', error);
       throw error;
     }
+  }
+
+  // Generate QR code with embedded VNVNC logo
+  static async generateQRCodeWithLogo(inviteUrl: string): Promise<string> {
+    return new Promise((resolve, reject) => {
+      try {
+        // First generate the QR code
+        QRCode.toCanvas(inviteUrl, {
+          errorCorrectionLevel: 'H', // High error correction for logo overlay
+          width: 800,
+          margin: 2,
+          color: {
+            dark: '#000000',
+            light: '#FFFFFF',
+          },
+        }, (error, canvas) => {
+          if (error) {
+            reject(error);
+            return;
+          }
+
+          const ctx = canvas.getContext('2d');
+          if (!ctx) {
+            reject(new Error('Could not get canvas context'));
+            return;
+          }
+
+          // Load and embed the VNVNC logo
+          const logo = new Image();
+          logo.onload = () => {
+            // Calculate logo position and size (20% of QR code)
+            const logoSize = canvas.width * 0.2;
+            const logoX = (canvas.width - logoSize) / 2;
+            const logoY = (canvas.height - logoSize) / 2;
+
+            // Create white background circle for logo
+            ctx.fillStyle = '#FFFFFF';
+            ctx.beginPath();
+            ctx.arc(canvas.width / 2, canvas.height / 2, logoSize / 2 + 10, 0, Math.PI * 2);
+            ctx.fill();
+
+            // Add red border around logo
+            ctx.strokeStyle = '#DC2626';
+            ctx.lineWidth = 4;
+            ctx.stroke();
+
+            // Draw the logo
+            ctx.drawImage(logo, logoX, logoY, logoSize, logoSize);
+
+            // Convert canvas to data URL
+            resolve(canvas.toDataURL('image/png'));
+          };
+
+          logo.onerror = () => {
+            // If logo fails to load, return QR without logo
+            resolve(canvas.toDataURL('image/png'));
+          };
+
+          // Use the VNVNC logo
+          logo.src = '/images/vnvnc-logo.png';
+        });
+      } catch (error) {
+        reject(error);
+      }
+    });
   }
 
   // Create a single invitation
@@ -81,27 +143,48 @@ export class InvitationManager {
     instagramHandle: string,
     bloggerName?: string,
     eventDate: '2025-08-29' | '2025-08-30' | 'both' = 'both',
-    batchName?: string
+    batchName?: string,
+    invitationType: 'link' | 'qr' = 'link'
   ): Promise<VNVNCInvitation> {
     try {
       const code = this.generateCode();
       const inviteUrl = `${this.baseUrl}/invite/${code}`;
-      const qrCodeUrl = await this.generateQRCode(inviteUrl, code);
+      // We'll generate QR codes on the client side now
 
-      const invitation: Omit<VNVNCInvitation, 'id'> = {
+      // Calculate expiration date based on event date
+      let expirationDate: Date;
+      if (eventDate === 'both') {
+        // Valid for both days, expires at end of Aug 31
+        expirationDate = new Date('2025-08-31T08:00:00');
+      } else if (eventDate === '2025-08-29') {
+        // Valid for Aug 29 only, expires at end of Aug 30 morning
+        expirationDate = new Date('2025-08-30T08:00:00');
+      } else {
+        // Valid for Aug 30 only, expires at end of Aug 31 morning
+        expirationDate = new Date('2025-08-31T08:00:00');
+      }
+
+      const invitation: any = {
         code,
         instagramHandle: instagramHandle.replace('@', ''), // Remove @ if present
-        bloggerName,
         status: 'created',
         inviteUrl,
-        qrCodeUrl,
-        createdAt: serverTimestamp() as Timestamp,
+        invitationType,
+        createdAt: serverTimestamp(),
+        expiresAt: Timestamp.fromDate(expirationDate),
         metadata: {
           eventDate,
           validForBothDays: eventDate === 'both',
-          batchName,
         },
       };
+
+      // Only add optional fields if they have values
+      if (bloggerName !== undefined && bloggerName !== null) {
+        invitation.bloggerName = bloggerName;
+      }
+      if (batchName !== undefined && batchName !== null) {
+        invitation.metadata.batchName = batchName;
+      }
 
       const docRef = await addDoc(collection(db, 'invitations'), invitation);
       
@@ -115,11 +198,67 @@ export class InvitationManager {
     }
   }
 
+  // Create invitation with specific code (for QR codes)
+  async createInvitationWithCode(
+    code: string,
+    instagramHandle: string,
+    eventDate: '2025-08-29' | '2025-08-30' | 'both' = 'both',
+    batchName?: string,
+    invitationType: 'link' | 'qr' = 'qr'
+  ): Promise<VNVNCInvitation> {
+    try {
+      const inviteUrl = `${this.baseUrl}/invite/${code}`;
+      
+      // Calculate expiration date based on event date
+      let expirationDate: Date;
+      if (eventDate === 'both') {
+        // Valid for both days, expires at end of Aug 31
+        expirationDate = new Date('2025-08-31T08:00:00');
+      } else if (eventDate === '2025-08-29') {
+        // Valid for Aug 29 only, expires at end of Aug 30 morning
+        expirationDate = new Date('2025-08-30T08:00:00');
+      } else {
+        // Valid for Aug 30 only, expires at end of Aug 31 morning
+        expirationDate = new Date('2025-08-31T08:00:00');
+      }
+
+      const invitation: any = {
+        code,
+        instagramHandle: instagramHandle.replace('@', ''),
+        status: 'created',
+        inviteUrl,
+        invitationType,
+        createdAt: serverTimestamp(),
+        expiresAt: Timestamp.fromDate(expirationDate),
+        metadata: {
+          eventDate,
+          validForBothDays: eventDate === 'both',
+        },
+      };
+
+      // Only add batchName if provided
+      if (batchName) {
+        invitation.metadata.batchName = batchName;
+      }
+
+      const docRef = await addDoc(collection(db, 'invitations'), invitation);
+      
+      return {
+        ...invitation,
+        id: docRef.id,
+      };
+    } catch (error) {
+      console.error('Error creating invitation with code:', error);
+      throw error;
+    }
+  }
+
   // Create batch invitations from Instagram list
   async createBatchInvitations(
     instagramHandles: string[],
     batchName: string,
-    eventDate: '2025-08-29' | '2025-08-30' | 'both' = 'both'
+    eventDate: '2025-08-29' | '2025-08-30' | 'both' = 'both',
+    invitationType: 'link' | 'qr' = 'link'
   ): Promise<VNVNCInvitation[]> {
     const invitations: VNVNCInvitation[] = [];
     
@@ -137,7 +276,8 @@ export class InvitationManager {
           handle,
           undefined,
           eventDate,
-          batchName
+          batchName,
+          invitationType
         );
         
         // Update invitation with batch ID
@@ -230,6 +370,16 @@ export class InvitationManager {
       } as VNVNCInvitation;
     } catch (error) {
       console.error('Error getting invitation by code:', error);
+      throw error;
+    }
+  }
+
+  // Delete an invitation
+  async deleteInvitation(invitationId: string): Promise<void> {
+    try {
+      await deleteDoc(doc(db, 'invitations', invitationId));
+    } catch (error) {
+      console.error('Error deleting invitation:', error);
       throw error;
     }
   }
