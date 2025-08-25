@@ -1,0 +1,156 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;900&display=swap&subset=cyrillic');
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    --vnvnc-red: #DC2626;
+    --vnvnc-darkred: #991B1B;
+    --vnvnc-lightred: #EF4444;
+    --vnvnc-black: #000000;
+    --vnvnc-gray: #1F2937;
+    --vnvnc-darkgray: #111111;
+  }
+
+  * {
+    box-sizing: border-box;
+  }
+
+  html,
+  body {
+    padding: 0;
+    margin: 0;
+    font-family: 'Inter', system-ui, sans-serif;
+    background-color: var(--vnvnc-black);
+    color: #ffffff;
+    overflow-x: hidden;
+  }
+
+  /* Telegram WebApp specific styles */
+  html[data-telegram-app] {
+    --tg-theme-bg-color: #000000;
+    --tg-theme-text-color: #ffffff;
+    --tg-theme-hint-color: #888888;
+    --tg-theme-link-color: #DC2626;
+    --tg-theme-button-color: #DC2626;
+    --tg-theme-button-text-color: #ffffff;
+    --tg-theme-header-bg-color: #DC2626;
+  }
+
+  a {
+    color: inherit;
+    text-decoration: none;
+  }
+}
+
+@layer components {
+  .vnvnc-border {
+    border: 2px solid var(--vnvnc-red);
+    box-shadow: 
+      0 0 10px rgba(220, 38, 38, 0.5),
+      inset 0 0 10px rgba(220, 38, 38, 0.2);
+  }
+
+  .vnvnc-button {
+    @apply px-6 py-3 bg-vnvnc-red text-white font-bold uppercase tracking-wider transition-all duration-300;
+    box-shadow: 0 0 10px rgba(220, 38, 38, 0.5);
+  }
+
+  .vnvnc-button:hover {
+    @apply bg-vnvnc-darkred;
+    box-shadow: 0 0 20px rgba(220, 38, 38, 0.8);
+  }
+
+  .vnvnc-button-outline {
+    @apply px-6 py-3 bg-transparent border-2 border-vnvnc-red text-vnvnc-red font-bold uppercase tracking-wider transition-all duration-300;
+  }
+
+  .vnvnc-button-outline:hover {
+    @apply bg-vnvnc-red text-white;
+    box-shadow: 0 0 20px rgba(220, 38, 38, 0.8);
+  }
+
+  .vnvnc-input {
+    @apply bg-vnvnc-darkgray border-2 border-vnvnc-gray text-white px-4 py-2 outline-none transition-all;
+  }
+
+  .vnvnc-input:focus {
+    @apply border-vnvnc-red;
+    box-shadow: 0 0 15px rgba(220, 38, 38, 0.3);
+  }
+
+  .qr-vnvnc-frame {
+    position: relative;
+    padding: 20px;
+    background: white;
+    border: 4px solid var(--vnvnc-red);
+    box-shadow: 0 0 30px rgba(220, 38, 38, 0.4);
+  }
+
+  /* Red glow effect */
+  .glow-red {
+    text-shadow: 0 0 20px rgba(220, 38, 38, 0.8);
+  }
+
+  /* Card styles */
+  .vnvnc-card {
+    @apply bg-vnvnc-darkgray border border-vnvnc-gray rounded-lg p-6 transition-all duration-300;
+  }
+
+  .vnvnc-card:hover {
+    @apply border-vnvnc-red;
+    box-shadow: 0 0 20px rgba(220, 38, 38, 0.2);
+  }
+
+  /* Success/Error states */
+  .success-state {
+    @apply text-green-500 border-green-500;
+  }
+
+  .error-state {
+    @apply text-red-500 border-red-500;
+  }
+
+  /* Loading animation */
+  .loading-dots {
+    display: inline-block;
+  }
+
+  .loading-dots::after {
+    content: '...';
+    animation: dots 1.5s steps(4, end) infinite;
+  }
+
+  @keyframes dots {
+    0%, 20% { content: ''; }
+    40% { content: '.'; }
+    60% { content: '..'; }
+    80%, 100% { content: '...'; }
+  }
+
+  /* Fade animations */
+  .fade-in {
+    animation: fadeIn 0.5s ease-in-out;
+  }
+
+  @keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+  }
+
+  .slide-up {
+    animation: slideUp 0.5s ease-out;
+  }
+
+  @keyframes slideUp {
+    from { 
+      transform: translateY(20px);
+      opacity: 0;
+    }
+    to { 
+      transform: translateY(0);
+      opacity: 1;
+    }
+  }
+}
