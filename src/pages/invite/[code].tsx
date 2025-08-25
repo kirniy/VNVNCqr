@@ -106,7 +106,7 @@ export default function InvitationPage() {
             <h1 className="text-4xl md:text-5xl font-bold mb-2 glow-red">
               VNVNC
             </h1>
-            <p className="text-vnvnc-red text-xl mb-8">BIRTHDAY EVENT</p>
+            <p className="text-vnvnc-red text-xl mb-8">ДЕНЬ РОЖДЕНИЯ КЛУБА</p>
             
             <div className="mb-8">
               <p className="text-3xl font-bold mb-2">{formatEventDate()}</p>
