@@ -63,3 +63,6 @@ generated-qr/
 *.log
 logos-temp/
 backup/
+
+# Scripts with sensitive data
+scripts/test-*.js
