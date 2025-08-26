@@ -178,7 +178,7 @@ export default function VNVNCVip() {
           {/* Logo */}
           <div className="absolute top-8 left-1/2 -translate-x-1/2">
             <Image
-              src="/images/angarlogogreen.png"
+              src="/images/vnvnc-logo.png"
               alt="VNVNC"
               width={120}
               height={60}
