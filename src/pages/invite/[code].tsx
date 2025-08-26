@@ -80,6 +80,7 @@ export default function InvitationPage() {
     <>
       <Head>
         <title>VNVNC Birthday Event | Эксклюзивное приглашение</title>
+        <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
         <meta name="description" content="Эксклюзивное приглашение на день рождения VNVNC - 29-30 августа 2025" />
         <meta property="og:title" content="VNVNC Birthday Event" />
         <meta property="og:description" content="Эксклюзивное приглашение на день рождения клуба" />
@@ -88,9 +89,9 @@ export default function InvitationPage() {
         <meta name="theme-color" content="#DC2626" />
       </Head>
 
-      <div className="min-h-screen bg-black text-white">
+      <div className="min-h-screen bg-black text-white overflow-y-auto">
         {/* Hero Section */}
-        <div className="relative h-screen flex flex-col items-center justify-center p-4 overflow-hidden">
+        <div className="relative min-h-screen flex flex-col items-center justify-center p-4 py-12">
           {/* Background gradient */}
           <div className="absolute inset-0 bg-gradient-to-b from-vnvnc-red/20 via-black to-black" />
           
@@ -101,7 +102,7 @@ export default function InvitationPage() {
               alt="VNVNC"
               width={300}
               height={180}
-              className="filter drop-shadow-2xl"
+              className="filter drop-shadow-2xl max-w-[80vw] h-auto"
               priority
             />
           </div>
