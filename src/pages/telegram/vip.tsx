@@ -183,6 +183,7 @@ export default function VNVNCVip() {
               width={120}
               height={60}
               className="drop-shadow-2xl"
+              style={{ filter: 'brightness(0) saturate(100%) invert(27%) sepia(51%) saturate(2878%) hue-rotate(346deg) brightness(104%) contrast(97%)' }}
             />
           </div>
 
