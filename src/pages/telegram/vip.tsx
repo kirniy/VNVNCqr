@@ -259,13 +259,22 @@ export default function VNVNCVip() {
                   Ваше приглашение
                 </h2>
 
-                <div className="bg-white rounded-2xl p-4 mb-6">
+                <a 
+                  href={`https://vnvnc-invites.vercel.app/invite/${vipData?.code}`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="block bg-white rounded-2xl p-4 mb-6 transition-all hover:scale-105 active:scale-95 cursor-pointer shadow-lg hover:shadow-xl"
+                  onClick={() => haptic('medium')}
+                >
                   <img
                     src={`/qr-vip/${vipData?.qrFile}`}
                     alt="QR Code"
                     className="w-full h-auto"
                   />
-                </div>
+                  <p className="text-center text-gray-500 text-sm mt-2">
+                    Нажмите, чтобы открыть приглашение
+                  </p>
+                </a>
 
                 <p className="text-white text-center mb-6">
                   @{vipData?.instagram}
